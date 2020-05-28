@@ -14,11 +14,6 @@ class TerminalScanner {
   static const MethodChannel _channel =
       const MethodChannel('com.yoren.terminal_scanner');
 
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
-
   static Future<bool> setupComScanner({
     @required String comPath,
     @required String baudRate,
