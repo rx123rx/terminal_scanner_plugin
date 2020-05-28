@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +29,12 @@ class TerminalScanner {
   static Future<bool> setupUsbScanner() async {
     _registerScanResultHandler();
     return await _channel.invokeMethod('setupUsbScanner');
+  }
+
+  static Future<List<String>> getAllDevicesPath() async {
+    String result = await _channel.invokeMethod('getAllDevicesPath');
+    var list = jsonDecode(result) as List<dynamic>;
+    return list.map((e) => e as String).toList();
   }
 
   static void _registerScanResultHandler() {

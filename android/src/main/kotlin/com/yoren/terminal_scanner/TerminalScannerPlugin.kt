@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
+import org.json.JSONArray
 
 class TerminalScannerPlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
@@ -56,7 +57,7 @@ class TerminalScannerPlugin : FlutterPlugin, MethodCallHandler {
                 setupUsbScanner()
             }
             "getAllDevicesPath" -> {
-                result.success(SerialPortFinder().allDevicesPath)
+                result.success(JSONArray(SerialPortFinder().allDevicesPath).toString())
             }
             else -> {
                 result.notImplemented()
