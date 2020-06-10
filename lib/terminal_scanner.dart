@@ -11,6 +11,8 @@ export 'src/com_path.dart';
 StreamController<String> scanResultStreamController =
     StreamController.broadcast();
 
+typedef ScanResultFilter = String Function(String scanResult);
+
 class TerminalScanner {
   static const MethodChannel _channel =
       const MethodChannel('com.yoren.terminal_scanner');
@@ -18,16 +20,17 @@ class TerminalScanner {
   static Future<bool> setupComScanner({
     @required String comPath,
     @required String baudRate,
+    ScanResultFilter scanResultFilter,
   }) async {
-    _registerScanResultHandler();
+    _registerScanResultHandler(scanResultFilter);
     return await _channel.invokeMethod('setupComScanner', {
       'comPath': comPath,
       'baudRate': baudRate,
     });
   }
 
-  static Future<bool> setupUsbScanner() async {
-    _registerScanResultHandler();
+  static Future<bool> setupUsbScanner(ScanResultFilter scanResultFilter) async {
+    _registerScanResultHandler(scanResultFilter);
     return await _channel.invokeMethod('setupUsbScanner');
   }
 
@@ -37,10 +40,14 @@ class TerminalScanner {
     return list.map((e) => e as String).toList();
   }
 
-  static void _registerScanResultHandler() {
+  static void _registerScanResultHandler(ScanResultFilter scanResultFilter) {
     _channel.setMethodCallHandler((call) {
       if (call.method == 'sendScanResult') {
-        scanResultStreamController.sink.add(call.arguments);
+        if (scanResultFilter != null) {
+          scanResultStreamController.sink.add(scanResultFilter(call.arguments));
+        } else {
+          scanResultStreamController.sink.add(call.arguments);
+        }
       }
       return Future.value('');
     });
